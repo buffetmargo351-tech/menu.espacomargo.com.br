@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Experiência Margô — Ateliê V26</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <main class="app">
+        <section class="hero hero-recorte">
+      <div class="hero-shell">
+        <div class="hero-top">
+          <div class="brand">Experiencia Margo</div>
+          <div class="consultora-badge"><span class="ico">◌</span> Consultora: Milene</div>
+        </div>
+
+        <div class="hero-meta">
+          <span class="meta-item"><span class="meta-icon">▣</span> 07/11/2026</span>
+          <span class="meta-divider"></span>
+
+          <span class="meta-item"><span class="meta-icon">⌘</span> 100 convidados</span>
+          <span class="meta-divider"></span>
+
+          <span class="meta-item">
+            <span class="meta-icon">☼</span>
+            <span class="mini-select-wrap">
+              <select class="mini-select" aria-label="Horário">
+                <option selected>Manhã</option>
+                <option>Tarde</option>
+              </select>
+            </span>
+          </span>
+          <span class="meta-divider"></span>
+
+          <span class="meta-item">
+            <span class="meta-icon">✦</span>
+            <span class="mini-select-wrap">
+              <select class="mini-select" aria-label="Experiência">
+                <option>Essencial</option>
+                <option selected>Celebração</option>
+                <option>Premium</option>
+                <option>Personalizada</option>
+              </select>
+            </span>
+          </span>
+        </div>
+
+        <div class="hero-recorte-grid">
+          <div class="hero-feature">
+            <div class="hero-feature-copy hero-actions">
+              <button class="edit-couple-btn" type="button">✎ Editar dados</button>
+              <span class="hero-consultora">Consultora: <strong>Milene</strong></span>
+            </div>
+          
+            <div class="couple-hero-title" aria-label="Nome do casal e contagem regressiva">
+              <div class="couple-names">ANA &amp; LUCAS</div>
+              <div class="couple-countdown">♡ Faltam <strong>128 dias</strong> para o grande “Sim”.</div>
+            </div>
+          </div>
+
+          <aside class="hero-summary">
+            <h3>Resumo da Experiência</h3>
+
+            <div class="hero-summary-line">
+              <span class="summary-icon">♡</span>
+              <span>
+                <small>Fase selecionada</small>
+                <strong>Antes do Sim</strong>
+              </span>
+            </div>
+
+            <div class="hero-summary-line">
+              <span class="summary-icon">⌂</span>
+              <span>
+                <small>Itens selecionados</small>
+                <strong>1 item</strong>
+              </span>
+            </div>
+
+            <div class="hero-summary-divider"></div>
+
+            <div class="hero-summary-invest">
+              <small>Investimento estimado</small>
+              <strong>R$ 8.750,00</strong><span class="info-dot">i</span>
+              <span class="hero-summary-note">Valores estimados para 100 convidados.<br>Sujeito a alterações.</span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="moments-wrap">
+      <div class="nav-arrow">‹</div>
+      <div class="moments" id="moments"></div>
+      <div class="nav-arrow">›</div>
+    </section>
+
+    <section class="content">
+      <div class="main-panel">
+        <div class="section-head">
+          <div>
+            <h2 id="momentTitle">Antes do Sim</h2>
+            <p id="momentDesc">Momentos de acolhimento para receber os convidados antes da cerimônia.</p>
+          </div>
+          <div class="pill" id="momentPill">4 escolhas disponíveis</div>
+        </div>
+        <div class="cards" id="cards"></div>
+      </div>
+      <div class="summary-hidden-logic" aria-hidden="true" style="display:none">
+        <span id="customValue">R$ 0</span>
+        <span id="totalValue">R$ 15.900</span>
+        <div id="chosen"></div>
+        <div id="empty"></div>
+        <input id="guests" type="number" value="100" />
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle">Título</h2>
+          <p id="modalDesc">Descrição</p>
+        </div>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="options" id="options"></div>
+      <div class="note">As escolhas serão calculadas automaticamente no resumo da experiência. Os valores por item não ficam visíveis para o casal.</div>
+    </div>
+  </div>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
