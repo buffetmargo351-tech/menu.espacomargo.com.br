@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Experiência Margô — Ateliê V49.5</title>
+  <title>Experiência Margô — Ateliê V49.6</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -3342,6 +3342,195 @@
       }
     }
 
+
+    /* =========================================================
+       V49.6 — revisão legível a 1 metro + QR independente do layout
+       ========================================================= */
+
+    #proposalBackdrop .proposal-review-card {
+      width: min(1180px, 96vw) !important;
+      max-height: 94vh !important;
+    }
+
+    #proposalBackdrop .proposal-review-header {
+      padding: 28px 34px !important;
+    }
+
+    #proposalBackdrop .proposal-review-header span {
+      font-size: 14px !important;
+    }
+
+    #proposalBackdrop .proposal-review-header h2 {
+      margin-top: 8px !important;
+      font-size: 40px !important;
+      line-height: 1.04 !important;
+    }
+
+    #proposalBackdrop .proposal-review-header p {
+      max-width: 850px;
+      font-size: 18px !important;
+      line-height: 1.45 !important;
+    }
+
+    #proposalBackdrop .proposal-close-btn {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 28px !important;
+    }
+
+    #proposalBackdrop .proposal-review-body {
+      padding: 28px 34px !important;
+    }
+
+    #proposalBackdrop .proposal-review-grid {
+      gap: 15px !important;
+    }
+
+    #proposalBackdrop .proposal-review-field {
+      min-height: 92px;
+      padding: 17px !important;
+    }
+
+    #proposalBackdrop .proposal-review-field small {
+      margin-bottom: 8px !important;
+      font-size: 14px !important;
+      line-height: 1.25 !important;
+    }
+
+    #proposalBackdrop .proposal-review-field strong {
+      font-size: 20px !important;
+      line-height: 1.35 !important;
+    }
+
+    #proposalBackdrop .proposal-items-review {
+      margin-top: 23px !important;
+      padding: 22px !important;
+    }
+
+    #proposalBackdrop .proposal-items-review h3 {
+      margin-bottom: 15px !important;
+      font-size: 30px !important;
+    }
+
+    #proposalBackdrop .proposal-review-item {
+      padding: 13px 0 !important;
+    }
+
+    #proposalBackdrop .proposal-review-item b {
+      margin-bottom: 5px !important;
+      font-size: 18px !important;
+      line-height: 1.3 !important;
+    }
+
+    #proposalBackdrop .proposal-review-item span {
+      font-size: 17px !important;
+      line-height: 1.5 !important;
+    }
+
+    #proposalBackdrop .proposal-review-status {
+      margin-top: 20px !important;
+      padding: 17px 19px !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+    }
+
+    #proposalBackdrop .proposal-review-footer {
+      gap: 14px !important;
+      padding: 20px 34px 28px !important;
+    }
+
+    #proposalBackdrop .proposal-secondary-btn,
+    #proposalBackdrop .proposal-primary-btn {
+      min-height: 56px !important;
+      padding: 13px 24px !important;
+      font-size: 17px !important;
+      border-radius: 12px !important;
+    }
+
+    .proposal-qr-panel {
+      position: fixed;
+      z-index: 5000;
+      top: 50%;
+      right: 24px;
+      width: 380px;
+      max-height: calc(100vh - 24px);
+      transform: translateY(-50%);
+      padding: 20px 24px 22px;
+      overflow: hidden;
+      border: 1px solid rgba(220,196,147,.58);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(198,154,88,.22), transparent 31%),
+        linear-gradient(145deg, rgba(15,29,22,.98), rgba(34,47,38,.98));
+      color: var(--margo-off-white);
+      text-align: center;
+      box-shadow: 0 32px 90px rgba(0,0,0,.48);
+    }
+
+    .proposal-qr-panel[hidden] {
+      display: none !important;
+    }
+
+    .proposal-qr-panel .qr-panel-kicker {
+      display: block;
+      color: var(--margo-dourado-claro);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+    }
+
+    .proposal-qr-panel h2 {
+      max-width: 330px;
+      margin: 8px auto 12px;
+      font-family: var(--margo-fonte-titulo);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1.08;
+      color: var(--margo-off-white);
+      overflow-wrap: anywhere;
+    }
+
+    .proposal-qr-large {
+      width: 288px;
+      height: 288px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      padding: 14px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 16px 38px rgba(0,0,0,.36);
+    }
+
+    .proposal-qr-large canvas,
+    .proposal-qr-large img,
+    .proposal-qr-large table {
+      display: block !important;
+      width: 260px !important;
+      height: 260px !important;
+      max-width: 260px !important;
+      max-height: 260px !important;
+      object-fit: contain !important;
+      image-rendering: pixelated;
+    }
+
+    .proposal-qr-panel p {
+      max-width: 320px;
+      margin: 0 auto;
+      color: rgba(255,250,242,.82);
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 900px) {
+      .proposal-qr-panel {
+        right: 50%;
+        width: min(380px, calc(100vw - 24px));
+        transform: translate(50%, -50%);
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -3463,6 +3652,19 @@
       </div>
     </section>
   </main>
+
+  <section id="proposalQrPanel"
+           class="proposal-qr-panel"
+           aria-live="polite"
+           aria-label="Proposta gerada"
+           hidden>
+    <span class="qr-panel-kicker">PROPOSTA GERADA</span>
+    <h2 id="proposalQrPanelCouple">Casal</h2>
+    <div id="proposalQrPanelCode"
+         class="proposal-qr-large"
+         aria-label="QR Code da proposta"></div>
+    <p>Aponte a câmera do celular para visualizar a proposta.</p>
+  </section>
 
   <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
     <div class="modal">
@@ -3638,7 +3840,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
-const MENU_MARGO_BUILD = 'V49.5';
+const MENU_MARGO_BUILD = 'V49.6';
 console.info('Menu Digital Margô', MENU_MARGO_BUILD);
 const ATELIE_API_URL = 'https://script.google.com/macros/s/AKfycbwBssy8vzD67VaAqFbyBv0hE8N70CaeDvTWJ247q-E0eeaXhVThSDraZR2mXx3hE1U3dg/exec';
     const CODE_BY_TITLE = {
@@ -5256,27 +5458,25 @@ const PHASE_ICONS = {
         return;
       }
 
-      const defaultSummary = document.getElementById('heroSummaryDefault');
-      const qrSummary = document.getElementById('heroSummaryQr');
-      const qrBox = document.getElementById('generatedQrCode');
-      const couple = document.getElementById('generatedQrCouple');
+      const panel = document.getElementById('proposalQrPanel');
+      const qrBox = document.getElementById('proposalQrPanelCode');
+      const couple = document.getElementById('proposalQrPanelCouple');
       const newButton = document.getElementById('newProposalBtn');
+      const size = 260;
 
-      defaultSummary.hidden = true;
-      qrSummary.hidden = false;
-      couple.textContent = data.nome_casal || 'Proposta personalizada';
+      couple.textContent =
+        data.nome_casal || 'Proposta personalizada';
       qrBox.innerHTML = '';
-
-      const size = window.innerWidth >= 1600 ? 150 : 132;
+      panel.hidden = false;
 
       if(window.QRCode){
         new window.QRCode(qrBox, {
           text: data.proposta_url,
           width: size,
           height: size,
-          colorDark: '#07110d',
+          colorDark: '#000000',
           colorLight: '#ffffff',
-          correctLevel: window.QRCode.CorrectLevel.M
+          correctLevel: window.QRCode.CorrectLevel.L
         });
       } else {
         const image = document.createElement('img');
@@ -5285,11 +5485,11 @@ const PHASE_ICONS = {
         image.height = size;
         image.decoding = 'async';
         image.src =
-          'https://quickchart.io/qr?size=300&margin=2&text=' +
+          'https://quickchart.io/qr?size=520&margin=4&ecLevel=L&text=' +
           encodeURIComponent(data.proposta_url);
         image.onerror = () => {
           qrBox.innerHTML =
-            '<span style="color:#4B3525;font-size:11px;line-height:1.3;padding:8px">' +
+            '<span style="color:#4B3525;font-size:14px;line-height:1.4;padding:14px">' +
             'Não foi possível montar o QR Code. Atualize esta página.' +
             '</span>';
         };
@@ -5302,13 +5502,12 @@ const PHASE_ICONS = {
     function startNewProposalForCurrentCouple(){
       sessionStorage.removeItem(GENERATED_PROPOSAL_KEY);
 
-      const defaultSummary = document.getElementById('heroSummaryDefault');
-      const qrSummary = document.getElementById('heroSummaryQr');
+      const panel = document.getElementById('proposalQrPanel');
+      const qrBox = document.getElementById('proposalQrPanelCode');
       const newButton = document.getElementById('newProposalBtn');
 
-      defaultSummary.hidden = false;
-      qrSummary.hidden = true;
-      document.getElementById('generatedQrCode').innerHTML = '';
+      panel.hidden = true;
+      qrBox.innerHTML = '';
       newButton.hidden = true;
 
       closeProposalIdentification();
