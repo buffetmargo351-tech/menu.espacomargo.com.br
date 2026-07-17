@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Proposta Personalizada Margô - V49.4</title>
+<title>Proposta Personalizada Margô - V49.5</title>
 <style>
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#0e1d16;font-family:Arial,sans-serif}
 #pages{width:100%}
@@ -20,7 +20,7 @@
   #pages{max-width:430px;margin:0 auto;background:#fffaf2;overflow:hidden}
   .page-shell{width:100%;height:auto;min-height:0;margin:0;display:block;overflow:hidden;background:#fffaf2;break-after:auto;page-break-after:auto}
   .page-shell + .page-shell{border-top:1px solid rgba(198,154,88,.22)}
-  .page-shell iframe{width:100%;height:1px;min-height:1px;overflow:hidden;background:#fffaf2}
+  .page-shell iframe{width:100%;height:141vw;min-height:520px;overflow:hidden;background:#fffaf2}
   .floating-actions{bottom:10px}
 }
 @page{size:A4;margin:0}
@@ -49,7 +49,19 @@ const ITEM_CATALOG={"MD-009":{"codigo":"MD-009","nome":"Welcome Drinks","descric
 const ATELIE_API_URL="https://script.google.com/macros/s/AKfycbwBssy8vzD67VaAqFbyBv0hE8N70CaeDvTWJ247q-E0eeaXhVThSDraZR2mXx3hE1U3dg/exec";
 const DEFAULT_DATA={"proposta_id":"PROP-DEMO-MD036","usuario_id":"USR-DEMO","nome_casal":"Ana & Lucas","data_evento":"07/11/2026","convidados":100,"periodo":"noite","itens":["MD-036"],"valor_total_formatado":"R$ 25.900,00","validade_dias":30};
 
-function decodeUtf8Base64(b64){const bin=atob(b64);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}
+function decodeUtf8Base64(b64){
+  const bin=atob(b64);
+  if(typeof TextDecoder!=='undefined'){
+    const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+  let encoded='';
+  for(let i=0;i<bin.length;i++){
+    encoded+='%'+bin.charCodeAt(i).toString(16).padStart(2,'0');
+  }
+  try{return decodeURIComponent(encoded)}
+  catch{return bin}
+}
 function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
 function formatDate(value){const s=String(value||'').trim();if(/^\d{2}\/\d{2}\/\d{4}$/.test(s))return s;if(/^\d{4}-\d{2}-\d{2}$/.test(s)){const [y,m,d]=s.split('-');return `${d}/${m}/${y}`}return s}
 function isoDate(value){const s=String(value||'').trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;const m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:''}
@@ -87,30 +99,102 @@ function getFriendlyRoute(){
   return{casal_id:'',slug:''};
 }
 
+
+function fetchJsonWithTimeout(url,timeout=9000){
+  const controller=typeof AbortController!=='undefined'
+    ? new AbortController()
+    : null;
+  const timer=setTimeout(()=>controller?.abort(),timeout);
+
+  return fetch(url,{
+    method:'GET',
+    cache:'no-store',
+    signal:controller?.signal
+  })
+    .then(response=>{
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .finally(()=>clearTimeout(timer));
+}
+
+function jsonpRequest(url,timeout=14000){
+  return new Promise((resolve,reject)=>{
+    const callback=
+      `margoJsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const script=document.createElement('script');
+    const separator=url.includes('?')?'&':'?';
+    const timer=setTimeout(()=>{
+      cleanup();
+      reject(new Error('Tempo esgotado ao carregar a proposta.'));
+    },timeout);
+
+    function cleanup(){
+      clearTimeout(timer);
+      script.remove();
+      try{delete window[callback]}catch{window[callback]=undefined}
+    }
+
+    window[callback]=result=>{
+      cleanup();
+      resolve(result);
+    };
+
+    script.onerror=()=>{
+      cleanup();
+      reject(new Error('Não foi possível acessar os dados da proposta.'));
+    };
+
+    script.src=
+      `${url}${separator}callback=${encodeURIComponent(callback)}`;
+    document.head.appendChild(script);
+  });
+}
+
+async function requestProposalData(url){
+  try{
+    return await fetchJsonWithTimeout(url,9000);
+  }catch(fetchError){
+    console.warn('Fetch da proposta falhou; tentando modo compatível.',fetchError);
+    return jsonpRequest(url,14000);
+  }
+}
+
+function showProposalLoadError(message){
+  const card=document.querySelector('.loading-card');
+  if(!card)return;
+
+  card.innerHTML=`
+    <strong>ESPAÇO MARGÔ</strong>
+    <h2>Não foi possível abrir a proposta</h2>
+    <p>${esc(message||'Confira a conexão e tente novamente.')}</p>
+    <button type="button"
+            onclick="location.reload()"
+            style="border:0;border-radius:999px;padding:12px 18px;
+                   background:#c69a58;color:#14251c;font-weight:800;
+                   cursor:pointer">
+      TENTAR NOVAMENTE
+    </button>
+  `;
+}
+
 async function getData(){
   const rota=getFriendlyRoute();
 
   if(rota.casal_id){
     try{
       const url=`${ATELIE_API_URL}?acao=obter_proposta&casal_id=${encodeURIComponent(rota.casal_id)}&slug=${encodeURIComponent(rota.slug)}&_=${Date.now()}`;
-      const response=await fetch(url,{method:'GET',cache:'no-store'});
-      if(!response.ok)throw new Error(`HTTP ${response.status}`);
-      const result=await response.json();
+      const result=await requestProposalData(url);
       if(!result.ok)throw new Error(result.erro||'Proposta não encontrada.');
 
       const proposta={...DEFAULT_DATA,...result.proposta};
 
-      if(
-        proposta.url_canonica &&
-        proposta.url_canonica!==location.href
-      ){
-        history.replaceState(null,'',proposta.url_canonica);
-      }
-
       return proposta;
     }catch(error){
       console.error('Falha ao carregar proposta personalizada:',error);
-      document.querySelector('.loading-card p').textContent='Não foi possível carregar esta proposta. Confira o endereço recebido.';
+      showProposalLoadError(
+        error?.message || 'Não foi possível carregar esta proposta.'
+      );
       throw error;
     }
   }
@@ -122,14 +206,14 @@ async function getData(){
   if(id&&token){
     try{
       const url=`${ATELIE_API_URL}?acao=obter_proposta&proposta_id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}&_=${Date.now()}`;
-      const response=await fetch(url,{method:'GET',cache:'no-store'});
-      if(!response.ok)throw new Error(`HTTP ${response.status}`);
-      const result=await response.json();
+      const result=await requestProposalData(url);
       if(!result.ok)throw new Error(result.erro||'Proposta não encontrada.');
       return {...DEFAULT_DATA,...result.proposta};
     }catch(error){
       console.error('Falha ao carregar proposta online:',error);
-      document.querySelector('.loading-card p').textContent='Não foi possível carregar esta proposta. Confira o link recebido.';
+      showProposalLoadError(
+        error?.message || 'Não foi possível carregar esta proposta.'
+      );
       throw error;
     }
   }
@@ -155,9 +239,13 @@ function normalizeItems(data){
   detailed.forEach(x=>{const code=x.codigo||(Array.isArray(x.codes)?x.codes[0]:'');if(code)byCode.set(code,x)});
   return codes.map(code=>{const cat=ITEM_CATALOG[code]||{codigo:code,nome:code,descricao:'Item escolhido durante a consultoria.',fase:'Escolha do casal',imagem_key:''};const det=byCode.get(code)||{};return {...cat,...det,codigo:code,imagem:det.imagem||ITEM_IMAGES[det.imagem_key||cat.imagem_key]||BASE_IMAGES.md036}});
 }
+function sanitizeTemplate(template){
+  return String(template||'')
+    .replace(/@import\s+url\([^;]+;?/gi,'');
+}
 function fill(template,data){
   const values={'__NOME_CASAL__':esc(data.nome_casal),'__DIAS_PARA_EVENTO__':esc(daysUntil(data.data_evento)),'__DATA_EVENTO__':esc(formatDate(data.data_evento)),'__CONVIDADOS__':esc(data.convidados),'__PERIODO__':esc(data.periodo==='manhã'?'Manhã':data.periodo==='noite'?'Noite':data.periodo),'__VALIDADE_DIAS__':esc(data.validade_dias||30)};
-  return Object.entries(values).reduce((t,[k,v])=>t.replaceAll(k,v),template)
+  return sanitizeTemplate(Object.entries(values).reduce((t,[k,v])=>t.replaceAll(k,v),template))
 }
 function pageSection(label,srcdoc,id=''){
   const sec=document.createElement('section');
@@ -261,14 +349,14 @@ async function shareProposal(){
 
   window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n\n'+url)}`,'_blank');
 }
-function baseCards(){return BASE_ITEMS.map((item,i)=>`<article class="base-card ${i===BASE_ITEMS.length-1?'wide':''}"><img src="${BASE_IMAGES[item.imagem]}" alt="" loading="lazy" decoding="async"><div class="base-copy"><h3>${esc(item.titulo)}</h3>${item.subtitulo?`<em>${esc(item.subtitulo)}</em>`:''}<p>${esc(item.descricao)}</p></div></article>`).join('')}
+function baseCards(){return BASE_ITEMS.map((item,i)=>`<article class="base-card ${i===BASE_ITEMS.length-1?'wide':''}"><img src="${BASE_IMAGES[item.imagem]}" alt="" decoding="async"><div class="base-copy"><h3>${esc(item.titulo)}</h3>${item.subtitulo?`<em>${esc(item.subtitulo)}</em>`:''}<p>${esc(item.descricao)}</p></div></article>`).join('')}
 function investment(data){return `<div class="investment"><span>Investimento da experiência</span><strong>${esc(data.valor_total_formatado||'Consulte a consultora')}</strong></div>`}
 function cardapioPage(data,item,isLast){
- const choice=item?`<div class="section-title">Escolha do casal</div><article class="choice-featured"><img src="${item.imagem}" alt="${esc(item.nome)}" loading="lazy" decoding="async"><div class="choice-copy"><div class="choice-code">${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`:'';
+ const choice=item?`<div class="section-title">Escolha do casal</div><article class="choice-featured"><img src="${item.imagem}" alt="${esc(item.nome)}" decoding="async"><div class="choice-copy"><div class="choice-code">${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`:'';
  return `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>${CARDAPIO_CSS}</style></head><body><main class="phone-frame"><section class="page"><header class="brand"><strong>ESPAÇO MARGÔ</strong><small>EVENTOS INESQUECÍVEIS</small></header><h1 class="title">Cardápio Completo do Casal</h1><div class="couple">${esc(data.nome_casal)}</div><p class="intro">Conheça todos os itens inclusos na experiência base e o menu escolhido especialmente por vocês.</p><div class="section-title">Inclusos na base</div><div class="base-grid">${baseCards()}</div>${choice}${isLast?investment(data):''}<footer class="footer"><b>♥</b> Cada detalhe pensado com amor para celebrar o que é eterno.</footer></section></main></body></html>`;
 }
 function choicesPage(data,items,isLast,index){
- const rows=items.map(item=>`<article class="choice-row"><img src="${item.imagem}" alt="${esc(item.nome)}" loading="lazy" decoding="async"><div class="choice-copy"><div class="phase">${esc(item.fase||'Escolha do casal')} · ${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`).join('');
+ const rows=items.map(item=>`<article class="choice-row"><img src="${item.imagem}" alt="${esc(item.nome)}" decoding="async"><div class="choice-copy"><div class="phase">${esc(item.fase||'Escolha do casal')} · ${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`).join('');
  return `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>${CARDAPIO_CSS}</style></head><body><main class="phone-frame"><section class="page"><header class="brand"><strong>ESPAÇO MARGÔ</strong><small>CONTINUAÇÃO DO CARDÁPIO</small></header><h1 class="title">Escolhas do Casal</h1><div class="couple">${esc(data.nome_casal)}</div><p class="intro">Itens selecionados durante a consultoria para personalizar a experiência.</p><div class="section-title">Composição personalizada</div><div class="choice-list">${rows}</div>${isLast?investment(data):''}<footer class="footer">Cardápio personalizado · página ${index}</footer></section></main></body></html>`;
 }
 
@@ -314,7 +402,7 @@ async function mount(){
    }
  });
 
- await waitForFirstFrame(p1.querySelector('iframe'),1100);
+ document.getElementById('loading').classList.add('hidden');
 
  try{
    const cta=p1.querySelector('iframe').contentDocument.querySelector('.cta');
@@ -330,7 +418,6 @@ async function mount(){
  }catch(e){}
 
  restoreDesktopFrames();
- document.getElementById('loading').classList.add('hidden');
  document.title=`Proposta Margô - ${data.nome_casal||'Casal'}`;
  registerProposalViewAsync(data);
 }

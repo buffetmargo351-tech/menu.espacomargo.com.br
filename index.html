@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Experiência Margô — Ateliê V49.4</title>
+  <title>Experiência Margô — Ateliê V49.5</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -3204,586 +3204,141 @@
       }
     }
 
-    /* Notebook, desktop e Smart TV em paisagem. */
-    @media (min-width: 1280px) and (min-aspect-ratio: 16/10) {
-      .edit-couple-btn,
-      .new-proposal-btn,
-      .fullscreen-btn,
-      .generate-proposal-btn {
-        min-height: 46px !important;
+
+    /* =========================================================
+       V49.5 — preserva o layout aprovado e estabiliza o QR Code
+       ========================================================= */
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .hero-summary-default,
+    .hero-summary-qr {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .hero-summary-qr {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 5px;
+      overflow: hidden;
+    }
+
+    .hero-summary-qr[hidden],
+    .hero-summary-default[hidden] {
+      display: none !important;
+    }
+
+    .qr-success-kicker {
+      color: var(--margo-dourado-claro);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      line-height: 1;
+    }
+
+    .hero-summary-qr h3 {
+      width: 100%;
+      margin: 2px 0 5px !important;
+      color: var(--margo-dourado-claro) !important;
+      font-size: 19px !important;
+      line-height: 1.06 !important;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .hero-summary-qr p {
+      max-width: 230px;
+      margin: 0;
+      color: rgba(255,250,242,.78);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .generated-qr-code {
+      width: 132px;
+      height: 132px;
+      min-width: 132px;
+      min-height: 132px;
+      display: grid;
+      place-items: center;
+      padding: 8px;
+      margin: 2px auto 5px;
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 14px 28px rgba(0,0,0,.28);
+    }
+
+    .generated-qr-code canvas,
+    .generated-qr-code img,
+    .generated-qr-code table {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      display: block !important;
+      object-fit: contain !important;
+      image-rendering: pixelated;
+    }
+
+    .hero-edit-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+    }
+
+    .new-proposal-btn {
+      width: 100%;
+    }
+
+    /* O desktop mantém exatamente a composição anterior aprovada. */
+    @media (min-width: 1101px) {
+      body > .app,
+      main.app,
+      .app {
+        width: 100%;
       }
 
-      button:focus-visible,
-      select:focus-visible,
-      input:focus-visible {
-        outline: 3px solid rgba(220,196,147,.55);
-        outline-offset: 3px;
+      .hero-summary {
+        overflow: hidden !important;
+      }
+
+      .hero-summary-qr {
+        padding: 2px 0;
       }
     }
 
-    /* Smart TVs e monitores Full HD. */
-    @media (min-width: 1600px) and (min-height: 820px) {
+    /* Na Smart TV apenas aproveita a largura extra; não reposiciona o layout. */
+    @media (min-width: 1600px) {
       body > .app,
       main.app,
       .app {
         width: 100vw !important;
-        max-width: 1920px !important;
-        grid-template-rows:
-          clamp(330px, 37vh, 410px)
-          clamp(120px, 13vh, 150px)
-          minmax(0, 1fr) !important;
-      }
-
-      .hero {
-        padding-left: clamp(52px, 4vw, 82px) !important;
-        padding-right: clamp(52px, 4vw, 82px) !important;
-      }
-
-      .hero-recorte-grid {
-        grid-template-columns: minmax(0, 1fr) clamp(390px, 24vw, 470px) !important;
-        gap: clamp(30px, 3vw, 56px) !important;
-      }
-
-      .hero-actions {
-        gap: 16px !important;
-      }
-
-      .edit-couple-btn,
-      .new-proposal-btn,
-      .fullscreen-btn {
-        font-size: 15px !important;
-        padding: 12px 18px !important;
-      }
-
-      .couple-name-input {
-        font-size: clamp(48px, 4vw, 72px) !important;
-      }
-
-      .couple-countdown {
-        font-size: clamp(28px, 2.25vw, 40px) !important;
-      }
-
-      .hero-summary {
-        padding: 18px 34px !important;
+        max-width: none !important;
+        margin: 0 !important;
       }
 
       .generated-qr-code {
-        width: clamp(190px, 13vw, 250px);
-        padding: 12px;
+        width: 150px;
+        height: 150px;
+        min-width: 150px;
+        min-height: 150px;
       }
 
-      .hero-summary-qr p {
-        max-width: 340px;
-        font-size: 15px;
-      }
-
-      .moments-wrap {
-        padding-left: 28px !important;
-        padding-right: 28px !important;
-      }
-
-      .moment {
-        min-height: 105px !important;
-      }
-
-      .moment h4 {
+      .hero-summary-qr h3 {
         font-size: 22px !important;
       }
 
-      .content {
-        padding-left: 46px !important;
-        padding-right: 46px !important;
-      }
-
-      .section-head h2 {
-        font-size: 35px !important;
-      }
-
-      .section-head p {
-        font-size: 16px !important;
-      }
-
-      .cards {
-        gap: 22px !important;
-      }
-
-      .card-title-line,
-      .card-body h3 {
-        font-size: 23px !important;
-      }
-
-      .card-body p,
-      .mini {
-        font-size: 14px !important;
-      }
-    }
-
-    /* 4K/TV grande: limita a largura útil sem criar faixas apertadas. */
-    @media (min-width: 2300px) {
-      body > .app,
-      main.app,
-      .app {
-        max-width: 2300px !important;
-      }
-    }
-
-  
-    
-    /* =========================================================
-       V49.4 — Layout estável para computador e Smart TV
-       ========================================================= */
-    [hidden] { display: none !important; }
-
-    @media (min-width: 1101px) {
-      html, body {
-        width: 100%;
-        height: 100%;
-        max-width: none;
-        overflow: hidden;
-      }
-
-      body {
-        margin: 0;
-      }
-
-      body > .app,
-      main.app,
-      .app {
-        width: 100%;
-        max-width: none;
-        height: 100vh;
-        margin: 0;
-        grid-template-rows:
-          clamp(390px, 43vh, 465px)
-          clamp(96px, 11vh, 124px)
-          minmax(0, 1fr) !important;
-      }
-
-      .hero.hero-recorte {
-        width: 100%;
-        min-width: 0;
-        padding: 10px 18px 0 !important;
-      }
-
-      .hero-shell {
-        width: 100%;
-        height: 100%;
-        min-width: 0;
-        display: grid !important;
-        grid-template-rows: auto minmax(0, 1fr) !important;
-      }
-
-      .hero-meta {
-        width: max-content !important;
-        max-width: calc(100% - 12px) !important;
-        margin: 0 0 8px 0 !important;
-      }
-
-      .hero-recorte-grid {
-        position: relative !important;
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) clamp(318px, 24vw, 376px) !important;
-        gap: 18px !important;
-        width: 100% !important;
-        height: 100% !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        align-items: stretch !important;
-        grid-template-rows: minmax(0, 1fr) !important;
-        overflow: hidden !important;
-      }
-
-      .hero-feature {
-        position: relative !important;
-        display: grid !important;
-        grid-template-columns: clamp(220px, 21vw, 290px) minmax(0, 1fr) !important;
-        grid-template-rows: auto minmax(0, 1fr) auto !important;
-        column-gap: 20px !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        height: 100% !important;
-        overflow: hidden !important;
-        padding: 18px 18px 16px 20px !important;
-      }
-
-      .experience-brand {
-        position: static !important;
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-        align-self: start !important;
-        justify-self: start !important;
-        width: 100% !important;
-        max-width: 280px !important;
-        margin: 0 !important;
-        font-size: clamp(28px, 2.45vw, 45px) !important;
-        line-height: .94 !important;
-        text-align: left !important;
-        transform: none !important;
-      }
-
-      .hero-actions {
-        position: static !important;
-        grid-column: 1 !important;
-        grid-row: 3 !important;
-        align-self: end !important;
-        justify-self: start !important;
-        width: 100% !important;
-        max-width: 280px !important;
-        margin: 0 !important;
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) minmax(100px, .82fr) !important;
-        grid-template-areas:
-          "edit full"
-          "cp cp" !important;
-        gap: 8px 10px !important;
-        transform: none !important;
-      }
-
-      .hero-edit-stack {
-        grid-area: edit !important;
-        width: 100% !important;
-        min-width: 0 !important;
-      }
-
-      .fullscreen-btn {
-        grid-area: full !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        align-self: start !important;
-      }
-
-      .hero-consultora.cp-session-indicator {
-        grid-area: cp !important;
-        display: flex !important;
-        align-items: center !important;
-        flex-wrap: wrap !important;
-        gap: 5px 7px !important;
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        overflow: visible !important;
-        white-space: normal !important;
-        font-size: 11px !important;
-        line-height: 1.25 !important;
-      }
-
-      .edit-couple-btn,
-      .new-proposal-btn,
-      .fullscreen-btn {
-        min-height: 42px !important;
-        padding: 9px 11px !important;
-        font-size: 13px !important;
-        line-height: 1.15 !important;
-      }
-
-      .new-proposal-btn {
-        margin-top: 7px !important;
-      }
-
-      .couple-hero-title {
-        position: static !important;
-        grid-column: 2 !important;
-        grid-row: 1 / 4 !important;
-        align-self: center !important;
-        justify-self: stretch !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: none !important;
-        padding: 0 10px 0 0 !important;
-        margin: 0 !important;
-        transform: none !important;
-        text-align: center !important;
-      }
-
-      .couple-names {
-        width: 100% !important;
-        min-width: 0 !important;
-        overflow: visible !important;
-      }
-
-      .couple-name-input {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        font-size: 56px;
-        line-height: 1 !important;
-        text-align: center !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: clip !important;
-      }
-
-      .couple-countdown {
-        width: 100% !important;
-        margin: 12px auto 0 !important;
-        padding: 0 8px !important;
-        font-size: clamp(19px, 1.75vw, 29px) !important;
-        line-height: 1.12 !important;
-        white-space: normal !important;
-        text-align: center !important;
-      }
-
-      .hero-summary {
-        position: relative !important;
-        inset: auto !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        height: 100% !important;
-        min-height: 0 !important;
-        max-height: 100% !important;
-        padding: 15px 20px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        overflow: hidden !important;
-      }
-
-      .hero-summary-default,
-      .hero-summary-qr {
-        width: 100% !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        max-height: 100% !important;
-        overflow: hidden !important;
-      }
-
-      .hero-summary-default h3,
-      .hero-summary-qr h3 {
-        margin: 0 0 9px !important;
-        font-size: clamp(21px, 1.8vw, 30px) !important;
-        line-height: 1.05 !important;
-        white-space: normal !important;
-      }
-
-      .hero-summary-line {
-        width: min(100%, 238px) !important;
-        grid-template-columns: 24px minmax(0, 1fr) !important;
-        gap: 10px !important;
-        margin: 0 auto 8px !important;
-        align-items: center !important;
-        text-align: left !important;
-      }
-
-      .hero-summary-line > span:last-child {
-        min-width: 0 !important;
-        align-items: flex-start !important;
-      }
-
-      .hero-summary-line small,
-      .hero-summary-invest small {
-        font-size: 11px !important;
-        line-height: 1.2 !important;
-      }
-
-      .hero-summary-line strong {
-        font-size: 17px !important;
-        line-height: 1.05 !important;
-      }
-
-      .hero-summary-divider {
-        width: 78% !important;
-        margin: 0 auto 9px !important;
-      }
-
-      .hero-summary-invest {
-        width: 100% !important;
-        min-height: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-      }
-
-      .hero-summary-invest strong {
-        max-width: 100% !important;
-        font-size: clamp(31px, 2.6vw, 43px) !important;
-        line-height: .96 !important;
-        white-space: normal !important;
-        overflow-wrap: anywhere !important;
-      }
-
-      .hero-summary-note {
-        max-width: 250px !important;
-        margin: 7px auto 0 !important;
-        font-size: 11px !important;
-        line-height: 1.3 !important;
-      }
-
-      .generate-proposal-btn {
-        width: min(100%, 242px) !important;
-        min-height: 40px !important;
-        margin-top: 10px !important;
-        padding: 9px 12px !important;
-      }
-
-      .qr-success-kicker {
-        font-size: 10px !important;
-        line-height: 1.1 !important;
-        margin-bottom: 3px !important;
-      }
-
-      .generated-qr-code {
-        width: 150px !important;
-        min-width: 150px !important;
-        max-width: 150px !important;
-        padding: 9px !important;
-        margin: 4px auto 8px !important;
-        overflow: visible !important;
-      }
-
-      .generated-qr-code canvas,
-      .generated-qr-code img {
-        width: 100% !important;
-        height: auto !important;
-        max-width: 100% !important;
-        display: block !important;
-      }
-
       .hero-summary-qr p {
-        max-width: 238px !important;
-        margin: 0 auto !important;
-        font-size: 12px !important;
-        line-height: 1.3 !important;
-      }
-
-      .moments-wrap,
-      .content {
-        width: 100% !important;
-        max-width: none !important;
-      }
-
-      .cards {
-        content-visibility: auto;
-        contain-intrinsic-size: 800px 360px;
-      }
-
-      .card {
-        contain: layout paint style;
-      }
-    }
-
-    @media (min-width: 1101px) and (max-width: 1280px) {
-      body > .app,
-      main.app,
-      .app {
-        grid-template-rows:
-          380px
-          94px
-          minmax(0, 1fr) !important;
-      }
-
-      .hero-recorte-grid {
-        grid-template-columns: minmax(0, 1fr) 305px !important;
-        gap: 14px !important;
-      }
-
-      .hero-feature {
-        grid-template-columns: 205px minmax(0, 1fr) !important;
-        column-gap: 14px !important;
-        padding-left: 16px !important;
-      }
-
-      .experience-brand {
-        font-size: 27px !important;
-      }
-
-      .hero-actions {
-        max-width: 205px !important;
-        grid-template-columns: minmax(0, 1fr) 92px !important;
-      }
-
-      .edit-couple-btn,
-      .new-proposal-btn,
-      .fullscreen-btn {
-        font-size: 11px !important;
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-      }
-
-      .couple-name-input {
-        font-size: 46px;
-      }
-
-      .couple-countdown {
-        font-size: 19px !important;
-      }
-
-      .hero-summary {
-        padding: 13px 15px !important;
-      }
-
-      .generated-qr-code {
-        width: 146px !important;
-        min-width: 146px !important;
-        max-width: 146px !important;
-      }
-    }
-
-    @media (min-width: 1600px) and (min-height: 820px) {
-      body > .app,
-      main.app,
-      .app {
-        grid-template-rows:
-          clamp(430px, 41vh, 490px)
-          clamp(108px, 11vh, 132px)
-          minmax(0, 1fr) !important;
-      }
-
-      .hero-recorte-grid {
-        grid-template-columns: minmax(0, 1fr) 390px !important;
-        gap: 22px !important;
-      }
-
-      .hero-feature {
-        grid-template-columns: 360px minmax(0, 1fr) !important;
-        column-gap: 28px !important;
-        padding: 24px 24px 20px 28px !important;
-      }
-
-      .experience-brand {
-        font-size: 48px !important;
-      }
-
-      .hero-actions {
-        max-width: 340px !important;
-      }
-
-      .edit-couple-btn,
-      .new-proposal-btn,
-      .fullscreen-btn {
-        min-height: 48px !important;
-        font-size: 14px !important;
-      }
-
-      .couple-name-input {
-        font-size: 72px;
-      }
-
-      .couple-countdown {
-        font-size: clamp(25px, 1.65vw, 32px) !important;
-      }
-
-      .hero-summary {
-        padding: 18px 25px !important;
-      }
-
-      .generated-qr-code {
-        width: 190px !important;
-        min-width: 190px !important;
-        max-width: 190px !important;
-      }
-
-      .hero-summary-qr p {
-        font-size: 14px !important;
+        font-size: 12px;
       }
     }
 
@@ -4081,9 +3636,9 @@
     </div>
   </div>
 
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
-const MENU_MARGO_BUILD = 'V49.4';
+const MENU_MARGO_BUILD = 'V49.5';
 console.info('Menu Digital Margô', MENU_MARGO_BUILD);
 const ATELIE_API_URL = 'https://script.google.com/macros/s/AKfycbwBssy8vzD67VaAqFbyBv0hE8N70CaeDvTWJ247q-E0eeaXhVThSDraZR2mXx3hE1U3dg/exec';
     const CODE_BY_TITLE = {
@@ -5712,10 +5267,7 @@ const PHASE_ICONS = {
       couple.textContent = data.nome_casal || 'Proposta personalizada';
       qrBox.innerHTML = '';
 
-      const size = Math.min(
-        300,
-        Math.max(190, Math.round(window.innerWidth * 0.14))
-      );
+      const size = window.innerWidth >= 1600 ? 150 : 132;
 
       if(window.QRCode){
         new window.QRCode(qrBox, {
@@ -5729,9 +5281,18 @@ const PHASE_ICONS = {
       } else {
         const image = document.createElement('img');
         image.alt = 'QR Code da proposta';
+        image.width = size;
+        image.height = size;
+        image.decoding = 'async';
         image.src =
-          'https://quickchart.io/qr?size=300&margin=1&text=' +
+          'https://quickchart.io/qr?size=300&margin=2&text=' +
           encodeURIComponent(data.proposta_url);
+        image.onerror = () => {
+          qrBox.innerHTML =
+            '<span style="color:#4B3525;font-size:11px;line-height:1.3;padding:8px">' +
+            'Não foi possível montar o QR Code. Atualize esta página.' +
+            '</span>';
+        };
         qrBox.appendChild(image);
       }
 
