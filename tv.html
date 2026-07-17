@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Experiência Margô — TV</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{
+      width:100%;
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background:#07110d;
+    }
+    #tvStage{
+      position:fixed;
+      left:0;
+      top:0;
+      width:1366px;
+      height:768px;
+      transform-origin:top left;
+      background:#07110d;
+    }
+    #tvStage iframe{
+      display:block;
+      width:1366px;
+      height:768px;
+      border:0;
+      background:#07110d;
+    }
+    #tvLoading{
+      position:fixed;
+      inset:0;
+      z-index:10;
+      display:grid;
+      place-items:center;
+      color:#dcc493;
+      font:700 20px Arial,sans-serif;
+      letter-spacing:.08em;
+      background:#07110d;
+    }
+    #tvLoading.hidden{display:none}
+  </style>
+</head>
+<body>
+  <div id="tvLoading">CARREGANDO EXPERIÊNCIA MARGÔ...</div>
+  <div id="tvStage">
+    <iframe
+      id="tvFrame"
+      src="./index.html?modo=tv"
+      title="Menu Digital Espaço Margô"
+      allow="fullscreen">
+    </iframe>
+  </div>
+
+  <script>
+    const BASE_WIDTH=1366;
+    const BASE_HEIGHT=768;
+
+    function fitTv(){
+      const scale=Math.min(
+        window.innerWidth/BASE_WIDTH,
+        window.innerHeight/BASE_HEIGHT
+      );
+
+      const stage=document.getElementById('tvStage');
+      const renderedWidth=BASE_WIDTH*scale;
+      const renderedHeight=BASE_HEIGHT*scale;
+
+      stage.style.transform=`scale(${scale})`;
+      stage.style.left=`${Math.max(0,(window.innerWidth-renderedWidth)/2)}px`;
+      stage.style.top=`${Math.max(0,(window.innerHeight-renderedHeight)/2)}px`;
+    }
+
+    window.addEventListener('resize',fitTv);
+    document.getElementById('tvFrame').addEventListener('load',()=>{
+      document.getElementById('tvLoading').classList.add('hidden');
+      fitTv();
+    });
+
+    fitTv();
+  </script>
+</body>
+</html>
