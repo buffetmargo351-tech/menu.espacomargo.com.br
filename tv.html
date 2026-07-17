@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Experiência Margô — TV</title>
+  <title>Experiência Margô — TV V49.7</title>
   <style>
     *{box-sizing:border-box}
     html,body{
@@ -50,7 +50,7 @@
       id="tvFrame"
       src="./index.html?modo=tv"
       title="Menu Digital Espaço Margô"
-      allow="fullscreen">
+      allow="fullscreen" allowfullscreen>
     </iframe>
   </div>
 
@@ -58,10 +58,18 @@
     const BASE_WIDTH=1366;
     const BASE_HEIGHT=768;
 
+    function viewportSize(){
+      return{
+        width:document.documentElement.clientWidth||window.innerWidth,
+        height:document.documentElement.clientHeight||window.innerHeight
+      };
+    }
+
     function fitTv(){
+      const viewport=viewportSize();
       const scale=Math.min(
-        window.innerWidth/BASE_WIDTH,
-        window.innerHeight/BASE_HEIGHT
+        viewport.width/BASE_WIDTH,
+        viewport.height/BASE_HEIGHT
       );
 
       const stage=document.getElementById('tvStage');
@@ -69,14 +77,86 @@
       const renderedHeight=BASE_HEIGHT*scale;
 
       stage.style.transform=`scale(${scale})`;
-      stage.style.left=`${Math.max(0,(window.innerWidth-renderedWidth)/2)}px`;
-      stage.style.top=`${Math.max(0,(window.innerHeight-renderedHeight)/2)}px`;
+      stage.style.left=`${Math.max(0,(viewport.width-renderedWidth)/2)}px`;
+      stage.style.top=`${Math.max(0,(viewport.height-renderedHeight)/2)}px`;
+    }
+
+    async function requestTvFullscreen(){
+      const target=document.documentElement;
+      const request=
+        target.requestFullscreen ||
+        target.webkitRequestFullscreen ||
+        target.msRequestFullscreen;
+
+      if(!request){
+        alert('O navegador desta TV não disponibiliza o modo de tela cheia.');
+        return;
+      }
+
+      try{
+        await request.call(target);
+      }catch(error){
+        console.warn('Não foi possível ativar a tela cheia:',error);
+      }
+
+      window.setTimeout(fitTv,80);
+      window.setTimeout(fitTv,350);
+    }
+
+    function connectFullscreenButton(){
+      const frame=document.getElementById('tvFrame');
+
+      try{
+        const frameWindow=frame.contentWindow;
+        const frameDocument=frame.contentDocument;
+
+        /*
+          Substitui a função original do Menu. Assim, ao tocar em
+          TELA CHEIA, quem entra em fullscreen é a página tv.html,
+          e não apenas o conteúdo interno de 1366 x 768.
+        */
+        frameWindow.abrirTelaCheia=requestTvFullscreen;
+
+        const fullscreenButton=frameDocument.querySelector('.fullscreen-btn');
+
+        if(fullscreenButton){
+          fullscreenButton.onclick=event=>{
+            event.preventDefault();
+            event.stopPropagation();
+            requestTvFullscreen();
+            return false;
+          };
+        }
+      }catch(error){
+        console.warn('Não foi possível conectar o botão Tela cheia:',error);
+      }
+    }
+
+    function refitAfterFullscreen(){
+      window.setTimeout(fitTv,40);
+      window.setTimeout(fitTv,220);
+      window.setTimeout(fitTv,600);
     }
 
     window.addEventListener('resize',fitTv);
+    window.addEventListener('orientationchange',refitAfterFullscreen);
+
+    document.addEventListener('fullscreenchange',refitAfterFullscreen);
+    document.addEventListener('webkitfullscreenchange',refitAfterFullscreen);
+    document.addEventListener('MSFullscreenChange',refitAfterFullscreen);
+
     document.getElementById('tvFrame').addEventListener('load',()=>{
       document.getElementById('tvLoading').classList.add('hidden');
+      connectFullscreenButton();
       fitTv();
+
+      /*
+        Alguns navegadores de Smart TV terminam de ajustar a área útil
+        alguns instantes depois que o iframe abre.
+      */
+      window.setTimeout(connectFullscreenButton,500);
+      window.setTimeout(fitTv,500);
+      window.setTimeout(fitTv,1200);
     });
 
     fitTv();
