@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Proposta Personalizada Margô - V49.2</title>
+<title>Proposta Personalizada Margô - V49.4</title>
 <style>
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#0e1d16;font-family:Arial,sans-serif}
 #pages{width:100%}
@@ -14,7 +14,7 @@
 .floating-actions button{flex:1;border:0;border-radius:999px;padding:12px 10px;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 12px 30px rgba(0,0,0,.28);cursor:pointer}
 .print-btn{background:#fffaf2;color:#14251c}.share-btn{background:#14251c;color:#fffaf2;border:1px solid rgba(198,154,88,.55)!important}
 .loading{position:fixed;inset:0;z-index:9999;background:rgba(7,17,13,.94);color:#fffaf2;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;transition:.25s}
-.loading.hidden{opacity:0;visibility:hidden;pointer-events:none}.loading-card{width:min(360px,100%);padding:28px;border:1px solid rgba(198,154,88,.45);border-radius:22px;background:rgba(16,34,25,.94)}.loading-card strong{display:block;color:#c69a58;letter-spacing:.16em;font-size:12px;margin-bottom:12px}.loading-card h2{font-family:Georgia,serif;font-weight:400;margin:0 0 8px}
+.loading.hidden{opacity:0;visibility:hidden;pointer-events:none}.loading-card{width:min(360px,100%);padding:28px;border:1px solid rgba(198,154,88,.45);border-radius:22px;background:rgba(16,34,25,.94)}.loading-card strong{display:block;color:#c69a58;letter-spacing:.16em;font-size:12px;margin-bottom:12px}.loading-card h2{font-family:Georgia,serif;font-weight:400;margin:0 0 8px}.loading-card:after{content:'';display:block;width:42px;height:42px;margin:18px auto 0;border:3px solid rgba(198,154,88,.25);border-top-color:#c69a58;border-radius:50%;animation:margoSpin .8s linear infinite}@keyframes margoSpin{to{transform:rotate(360deg)}}
 @media(max-width:900px){
   body{background:#fffaf2;padding-bottom:76px}
   #pages{max-width:430px;margin:0 auto;background:#fffaf2;overflow:hidden}
@@ -34,7 +34,7 @@
 </style>
 </head>
 <body>
-<div id="loading" class="loading"><div class="loading-card"><strong>ESPAÇO MARGÔ</strong><h2>Preparando a proposta...</h2><p>Organizando os detalhes escolhidos pelo casal.</p></div></div>
+<div id="loading" class="loading"><div class="loading-card"><strong>ESPAÇO MARGÔ</strong><h2>Preparando a proposta...</h2><p>Carregando os detalhes escolhidos pelo casal. Isso leva apenas alguns segundos.</p></div></div>
 <main id="pages"></main>
 <div class="floating-actions"><button class="print-btn" onclick="window.print()">Salvar em PDF</button><button class="share-btn" onclick="shareProposal()">Compartilhar</button></div>
 <script>
@@ -261,14 +261,14 @@ async function shareProposal(){
 
   window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n\n'+url)}`,'_blank');
 }
-function baseCards(){return BASE_ITEMS.map((item,i)=>`<article class="base-card ${i===BASE_ITEMS.length-1?'wide':''}"><img src="${BASE_IMAGES[item.imagem]}" alt=""><div class="base-copy"><h3>${esc(item.titulo)}</h3>${item.subtitulo?`<em>${esc(item.subtitulo)}</em>`:''}<p>${esc(item.descricao)}</p></div></article>`).join('')}
+function baseCards(){return BASE_ITEMS.map((item,i)=>`<article class="base-card ${i===BASE_ITEMS.length-1?'wide':''}"><img src="${BASE_IMAGES[item.imagem]}" alt="" loading="lazy" decoding="async"><div class="base-copy"><h3>${esc(item.titulo)}</h3>${item.subtitulo?`<em>${esc(item.subtitulo)}</em>`:''}<p>${esc(item.descricao)}</p></div></article>`).join('')}
 function investment(data){return `<div class="investment"><span>Investimento da experiência</span><strong>${esc(data.valor_total_formatado||'Consulte a consultora')}</strong></div>`}
 function cardapioPage(data,item,isLast){
- const choice=item?`<div class="section-title">Escolha do casal</div><article class="choice-featured"><img src="${item.imagem}" alt="${esc(item.nome)}"><div class="choice-copy"><div class="choice-code">${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`:'';
+ const choice=item?`<div class="section-title">Escolha do casal</div><article class="choice-featured"><img src="${item.imagem}" alt="${esc(item.nome)}" loading="lazy" decoding="async"><div class="choice-copy"><div class="choice-code">${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`:'';
  return `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>${CARDAPIO_CSS}</style></head><body><main class="phone-frame"><section class="page"><header class="brand"><strong>ESPAÇO MARGÔ</strong><small>EVENTOS INESQUECÍVEIS</small></header><h1 class="title">Cardápio Completo do Casal</h1><div class="couple">${esc(data.nome_casal)}</div><p class="intro">Conheça todos os itens inclusos na experiência base e o menu escolhido especialmente por vocês.</p><div class="section-title">Inclusos na base</div><div class="base-grid">${baseCards()}</div>${choice}${isLast?investment(data):''}<footer class="footer"><b>♥</b> Cada detalhe pensado com amor para celebrar o que é eterno.</footer></section></main></body></html>`;
 }
 function choicesPage(data,items,isLast,index){
- const rows=items.map(item=>`<article class="choice-row"><img src="${item.imagem}" alt="${esc(item.nome)}"><div class="choice-copy"><div class="phase">${esc(item.fase||'Escolha do casal')} · ${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`).join('');
+ const rows=items.map(item=>`<article class="choice-row"><img src="${item.imagem}" alt="${esc(item.nome)}" loading="lazy" decoding="async"><div class="choice-copy"><div class="phase">${esc(item.fase||'Escolha do casal')} · ${esc(item.codigo||'')}</div><h3>${esc(item.nome)}</h3><p>${esc(item.descricao)}</p></div></article>`).join('');
  return `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>${CARDAPIO_CSS}</style></head><body><main class="phone-frame"><section class="page"><header class="brand"><strong>ESPAÇO MARGÔ</strong><small>CONTINUAÇÃO DO CARDÁPIO</small></header><h1 class="title">Escolhas do Casal</h1><div class="couple">${esc(data.nome_casal)}</div><p class="intro">Itens selecionados durante a consultoria para personalizar a experiência.</p><div class="section-title">Composição personalizada</div><div class="choice-list">${rows}</div>${isLast?investment(data):''}<footer class="footer">Cardápio personalizado · página ${index}</footer></section></main></body></html>`;
 }
 
