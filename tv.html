@@ -5,9 +5,14 @@
   <meta
     name="viewport"
     content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <title>Experiência Margô — TV V49.8</title>
+  <title>Experiência Margô — TV V49.9</title>
 
   <style>
+    :root {
+      --safe-x: 6vw;
+      --safe-y: 5vh;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -23,22 +28,18 @@
       touch-action: none;
     }
 
-    /*
-      A moldura recorta qualquer excesso que o navegador da TV tente
-      desenhar fora da área realmente visível.
-    */
-    #tvViewport {
+    #safeViewport {
       position: fixed;
-      inset: 0;
+      inset:
+        var(--safe-y)
+        var(--safe-x)
+        var(--safe-y)
+        var(--safe-x);
       overflow: hidden;
       background: #07110d;
       contain: strict;
     }
 
-    /*
-      O Menu continua trabalhando internamente em 1366 × 768,
-      que é o layout já aprovado no computador.
-    */
     #tvStage {
       position: absolute;
       left: 50%;
@@ -46,7 +47,7 @@
       width: 1366px;
       height: 768px;
       transform-origin: 50% 50%;
-      transform: translate(-50%, -50%) scale(.7);
+      transform: translate(-50%, -50%) scale(.75);
       will-change: transform;
       backface-visibility: hidden;
       background: #07110d;
@@ -67,11 +68,11 @@
       z-index: 20;
       display: grid;
       place-items: center;
-      padding: 30px;
+      padding: 32px;
       color: #dcc493;
       background: #07110d;
       text-align: center;
-      font: 700 20px/1.4 Arial, sans-serif;
+      font: 700 20px/1.45 Arial, sans-serif;
       letter-spacing: .08em;
     }
 
@@ -82,9 +83,11 @@
 </head>
 
 <body>
-  <div id="tvLoading">CARREGANDO EXPERIÊNCIA MARGÔ...</div>
+  <div id="tvLoading">
+    CARREGANDO EXPERIÊNCIA MARGÔ...
+  </div>
 
-  <div id="tvViewport">
+  <div id="safeViewport">
     <div id="tvStage">
       <iframe
         id="tvFrame"
@@ -100,61 +103,35 @@
     const BASE_WIDTH = 1366;
     const BASE_HEIGHT = 768;
 
-    /*
-      Reserva técnica contra o overscan das Smart TVs.
-      A diferença é pequena visualmente, mas impede corte nas quatro bordas.
-    */
-    const SAFE_SCALE_NORMAL = 0.965;
-    const SAFE_SCALE_FULLSCREEN = 0.975;
-
-    function isFullscreen() {
-      return Boolean(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.msFullscreenElement
-      );
-    }
-
-    function visibleViewport() {
-      const visual = window.visualViewport;
-
-      const widths = [
-        visual?.width,
-        document.documentElement.clientWidth,
-        window.innerWidth
-      ].filter(value => Number.isFinite(value) && value > 0);
-
-      const heights = [
-        visual?.height,
-        document.documentElement.clientHeight,
-        window.innerHeight
-      ].filter(value => Number.isFinite(value) && value > 0);
+    function getSafeViewportSize() {
+      const rect =
+        document
+          .getElementById('safeViewport')
+          .getBoundingClientRect();
 
       return {
-        width: Math.min(...widths),
-        height: Math.min(...heights)
+        width: Math.max(1, rect.width),
+        height: Math.max(1, rect.height)
       };
     }
 
     function fitTv() {
-      const viewport = visibleViewport();
-      const safety = isFullscreen()
-        ? SAFE_SCALE_FULLSCREEN
-        : SAFE_SCALE_NORMAL;
+      const viewport = getSafeViewportSize();
 
       const scale = Math.min(
         viewport.width / BASE_WIDTH,
         viewport.height / BASE_HEIGHT
-      ) * safety;
+      );
 
-      const stage = document.getElementById('tvStage');
-
-      stage.style.transform =
-        `translate(-50%, -50%) translateZ(0) scale(${scale})`;
+      document
+        .getElementById('tvStage')
+        .style
+        .transform =
+          `translate(-50%, -50%) translateZ(0) scale(${scale})`;
     }
 
     function scheduleFit() {
-      [0, 80, 220, 500, 1000].forEach(delay => {
+      [0, 80, 220, 500, 1000, 1800].forEach(delay => {
         window.setTimeout(fitTv, delay);
       });
     }
@@ -193,12 +170,16 @@
         const frameWindow = frame.contentWindow;
         const frameDocument = frame.contentDocument;
 
-        frameWindow.abrirTelaCheia = requestTvFullscreen;
+        frameWindow.abrirTelaCheia =
+          requestTvFullscreen;
 
         const button =
           frameDocument.querySelector('.fullscreen-btn');
 
-        if (!button || button.dataset.tvFullscreenConnected === 'SIM') {
+        if (
+          !button ||
+          button.dataset.tvFullscreenConnected === 'SIM'
+        ) {
           return;
         }
 
@@ -209,8 +190,12 @@
           'click',
           event => {
             event.preventDefault();
+            event.stopPropagation();
             event.stopImmediatePropagation();
+
             requestTvFullscreen();
+
+            return false;
           },
           true
         );
@@ -224,20 +209,26 @@
 
     function afterViewportChange() {
       scheduleFit();
-      window.setTimeout(connectFullscreenButton, 300);
+
+      window.setTimeout(
+        connectFullscreenButton,
+        250
+      );
     }
 
-    window.addEventListener('resize', afterViewportChange);
-    window.addEventListener('orientationchange', afterViewportChange);
-
-    window.visualViewport?.addEventListener(
+    window.addEventListener(
       'resize',
       afterViewportChange
     );
 
+    window.addEventListener(
+      'orientationchange',
+      afterViewportChange
+    );
+
     window.visualViewport?.addEventListener(
-      'scroll',
-      fitTv
+      'resize',
+      afterViewportChange
     );
 
     document.addEventListener(
@@ -257,7 +248,9 @@
 
     if ('ResizeObserver' in window) {
       new ResizeObserver(scheduleFit)
-        .observe(document.documentElement);
+        .observe(
+          document.getElementById('safeViewport')
+        );
     }
 
     document
@@ -270,8 +263,11 @@
         connectFullscreenButton();
         scheduleFit();
 
-        [300, 700, 1400, 2500].forEach(delay => {
-          window.setTimeout(connectFullscreenButton, delay);
+        [300, 700, 1400, 2500, 4000].forEach(delay => {
+          window.setTimeout(
+            connectFullscreenButton,
+            delay
+          );
         });
       });
 
