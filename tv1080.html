@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <title>Experiência Margô — TV 1080p V49.11</title>
+
+  <style>
+    :root {
+      --tv-width: 1920px;
+      --tv-height: 1080px;
+
+      /*
+        Área segura real para compensar overscan.
+        6% de margem em cada lado da tela 1080p.
+      */
+      --safe-left: 115px;
+      --safe-top: 65px;
+      --safe-width: 1690px;
+      --safe-height: 950px;
+
+      --menu-width: 1366px;
+      --menu-height: 768px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden !important;
+      background: #07110d;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
+    /*
+      Tela virtual nativa da televisão: 1920 × 1080.
+      Ela sempre é reduzida por contain, nunca por cover.
+    */
+    #tvCanvas {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: var(--tv-width);
+      height: var(--tv-height);
+
+      transform:
+        translate(-50%, -50%)
+        translateZ(0)
+        scale(.8);
+
+      transform-origin: 50% 50%;
+      overflow: hidden;
+      background: #07110d;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
+    /*
+      Área segura dentro dos 1920 × 1080.
+      Mesmo que a TV aplique overscan, o conteúdo útil permanece inteiro.
+    */
+    #safeArea {
+      position: absolute;
+      left: var(--safe-left);
+      top: var(--safe-top);
+      width: var(--safe-width);
+      height: var(--safe-height);
+      overflow: hidden;
+      background: #07110d;
+    }
+
+    /*
+      O layout aprovado do computador continua em 1366 × 768.
+      Ele é ampliado proporcionalmente apenas dentro da área segura.
+    */
+    #menuStage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--menu-width);
+      height: var(--menu-height);
+
+      transform:
+        translate(-50%, -50%)
+        translateZ(0)
+        scale(1.237);
+
+      transform-origin: 50% 50%;
+      overflow: hidden;
+      background: #07110d;
+    }
+
+    #menuFrame {
+      display: block;
+      width: var(--menu-width);
+      height: var(--menu-height);
+      border: 0;
+      overflow: hidden;
+      background: #07110d;
+    }
+
+    #tvLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      color: #dcc493;
+      background: #07110d;
+      text-align: center;
+      font: 700 20px/1.45 Arial, sans-serif;
+      letter-spacing: .08em;
+    }
+
+    #tvLoading.hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="tvLoading">
+    CARREGANDO EXPERIÊNCIA MARGÔ...
+  </div>
+
+  <div id="tvCanvas">
+    <div id="safeArea">
+      <div id="menuStage">
+        <iframe
+          id="menuFrame"
+          src="./index.html?modo=tv&tv_build=4911"
+          title="Menu Digital Espaço Margô"
+          allow="fullscreen"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TV_WIDTH = 1920;
+    const TV_HEIGHT = 1080;
+
+    const SAFE_WIDTH = 1690;
+    const SAFE_HEIGHT = 950;
+
+    const MENU_WIDTH = 1366;
+    const MENU_HEIGHT = 768;
+
+    function currentViewport() {
+      const visual = window.visualViewport;
+
+      const widths = [
+        visual && visual.width,
+        document.documentElement.clientWidth,
+        window.innerWidth
+      ].filter(value => Number.isFinite(value) && value > 0);
+
+      const heights = [
+        visual && visual.height,
+        document.documentElement.clientHeight,
+        window.innerHeight
+      ].filter(value => Number.isFinite(value) && value > 0);
+
+      return {
+        width: Math.min.apply(null, widths),
+        height: Math.min.apply(null, heights)
+      };
+    }
+
+    function fitTv() {
+      const viewport = currentViewport();
+
+      /*
+        O canvas 1920 × 1080 sempre cabe inteiro no navegador.
+        Nunca usa cover e, portanto, nunca corta.
+      */
+      const canvasScale = Math.min(
+        viewport.width / TV_WIDTH,
+        viewport.height / TV_HEIGHT
+      );
+
+      /*
+        O Menu aprovado de 1366 × 768 sempre cabe inteiro
+        dentro da área segura 1690 × 950.
+      */
+      const menuScale = Math.min(
+        SAFE_WIDTH / MENU_WIDTH,
+        SAFE_HEIGHT / MENU_HEIGHT
+      );
+
+      document
+        .getElementById('tvCanvas')
+        .style
+        .transform =
+          'translate(-50%, -50%) translateZ(0) scale(' +
+          canvasScale +
+          ')';
+
+      document
+        .getElementById('menuStage')
+        .style
+        .transform =
+          'translate(-50%, -50%) translateZ(0) scale(' +
+          menuScale +
+          ')';
+    }
+
+    function scheduleFit() {
+      [0, 60, 160, 350, 700, 1200, 2200].forEach(delay => {
+        window.setTimeout(fitTv, delay);
+      });
+    }
+
+    async function requestTvFullscreen() {
+      const target = document.documentElement;
+
+      const request =
+        target.requestFullscreen ||
+        target.webkitRequestFullscreen ||
+        target.msRequestFullscreen;
+
+      if (!request) {
+        alert(
+          'O navegador desta TV não disponibiliza o modo de tela cheia.'
+        );
+        return;
+      }
+
+      try {
+        await request.call(target);
+      } catch (error) {
+        console.warn(
+          'Não foi possível ativar a tela cheia:',
+          error
+        );
+      }
+
+      scheduleFit();
+    }
+
+    function connectFullscreenButton() {
+      const frame = document.getElementById('menuFrame');
+
+      try {
+        const frameWindow = frame.contentWindow;
+        const frameDocument = frame.contentDocument;
+
+        frameWindow.abrirTelaCheia =
+          requestTvFullscreen;
+
+        const button =
+          frameDocument.querySelector('.fullscreen-btn');
+
+        if (
+          !button ||
+          button.dataset.tvFullscreenConnected === 'SIM'
+        ) {
+          return;
+        }
+
+        button.dataset.tvFullscreenConnected = 'SIM';
+        button.removeAttribute('onclick');
+
+        button.addEventListener(
+          'click',
+          event => {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            requestTvFullscreen();
+
+            return false;
+          },
+          true
+        );
+      } catch (error) {
+        console.warn(
+          'Não foi possível conectar o botão Tela cheia:',
+          error
+        );
+      }
+    }
+
+    function afterViewportChange() {
+      scheduleFit();
+
+      window.setTimeout(
+        connectFullscreenButton,
+        250
+      );
+    }
+
+    window.addEventListener(
+      'resize',
+      afterViewportChange
+    );
+
+    window.addEventListener(
+      'orientationchange',
+      afterViewportChange
+    );
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        'resize',
+        afterViewportChange
+      );
+    }
+
+    document.addEventListener(
+      'fullscreenchange',
+      afterViewportChange
+    );
+
+    document.addEventListener(
+      'webkitfullscreenchange',
+      afterViewportChange
+    );
+
+    document.addEventListener(
+      'MSFullscreenChange',
+      afterViewportChange
+    );
+
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(scheduleFit)
+        .observe(document.documentElement);
+    }
+
+    document
+      .getElementById('menuFrame')
+      .addEventListener('load', () => {
+        document
+          .getElementById('tvLoading')
+          .classList.add('hidden');
+
+        connectFullscreenButton();
+        scheduleFit();
+
+        [300, 700, 1400, 2500, 4000].forEach(delay => {
+          window.setTimeout(
+            connectFullscreenButton,
+            delay
+          );
+        });
+      });
+
+    scheduleFit();
+  </script>
+</body>
+</html>
